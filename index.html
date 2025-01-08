@@ -83,102 +83,105 @@
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSpIW6ptzBpQ6R15IlmK-bVAl4zoZ4Iyg2FOzIpBoDWT2xVNPP2YGfOqp4uAwG5lix2IW02rOJNijDX/pub?output=csv';  // Replace with your Google Sheets CSV URL
 
         async function fetchEvents() {
-            const response = await fetch(csvUrl);
-            const csvText = await response.text();
+    const csvUrl = 'YOUR_CSV_URL_HERE';  // Replace with your Google Sheets CSV URL
+    const response = await fetch(csvUrl);
+    const csvText = await response.text();
 
-            // Parse CSV
-            const events = {};
-            const rows = csvText.split('\n').slice(1); // Skip header row
+    // Parse CSV rows
+    const events = {};
+    const rows = csvText.split('\n').slice(1); // Skip header row
 
-            rows.forEach(row => {
-                const [timestamp, date, type, description] = row.split(',');
+    rows.forEach(row => {
+        const [timestamp, date, type, description] = row.split(',');
 
-                if (date && type && description) {
-                    if (!events[date.trim()]) {
-                        events[date.trim()] = [];
-                    }
-                    events[date.trim()].push({ type: type.trim(), description: description.trim() });
-                }
-            });
+        if (date && description) {
+            const [month, day] = date.trim().split('-').slice(1); // Only get month and day
+            const formattedDate = `${month}-${day}`;
+            if (!events[formattedDate]) {
+                events[formattedDate] = [];
+            }
+            events[formattedDate].push(`${type.trim()}: ${description.trim()}`);
+        }
+    });
 
-            return events;
+    return events;
+}
+
+async function generateCalendar(year) {
+    const events = await fetchEvents();
+
+    for (let month = 0; month < 12; month++) {
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const monthDiv = document.createElement('div');
+        monthDiv.classList.add('month');
+
+        const monthTitle = document.createElement('h2');
+        monthTitle.textContent = `${months[month]} ${year}`;
+        monthDiv.appendChild(monthTitle);
+
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const tr = document.createElement('tr');
+
+        days.forEach(day => {
+            const th = document.createElement('th');
+            th.textContent = day;
+            tr.appendChild(th);
+        });
+
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        let row = document.createElement('tr');
+
+        // Fill initial empty cells
+        for (let i = 0; i < firstDay; i++) {
+            const emptyCell = document.createElement('td');
+            row.appendChild(emptyCell);
         }
 
-        async function generateCalendar(year) {
-            const events = await fetchEvents();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const cell = document.createElement('td');
+            cell.textContent = day;
 
-            for (let month = 0; month < 12; month++) {
-                const firstDay = new Date(year, month, 1).getDay();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
+            // Highlight weekends
+            const dayOfWeek = new Date(year, month, day).getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                cell.classList.add('weekend');
+            }
 
-                const monthDiv = document.createElement('div');
-                monthDiv.classList.add('month');
-
-                const monthTitle = document.createElement('h2');
-                monthTitle.textContent = `${months[month]} ${year}`;
-                monthDiv.appendChild(monthTitle);
-
-                const table = document.createElement('table');
-                const thead = document.createElement('thead');
-                const tr = document.createElement('tr');
-
-                days.forEach(day => {
-                    const th = document.createElement('th');
-                    th.textContent = day;
-                    tr.appendChild(th);
+            // Check for events based on month and day only
+            const formattedDate = `${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            if (events[formattedDate]) {
+                events[formattedDate].forEach(event => {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.classList.add('event');
+                    eventDiv.textContent = event;
+                    cell.appendChild(eventDiv);
                 });
+            }
 
-                thead.appendChild(tr);
-                table.appendChild(thead);
+            row.appendChild(cell);
 
-                const tbody = document.createElement('tbody');
-                let row = document.createElement('tr');
-
-                // Fill initial empty cells
-                for (let i = 0; i < firstDay; i++) {
-                    const emptyCell = document.createElement('td');
-                    row.appendChild(emptyCell);
-                }
-
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const cell = document.createElement('td');
-                    cell.textContent = day;
-
-                    // Highlight weekends
-                    const dayOfWeek = new Date(year, month, day).getDay();
-                    if (dayOfWeek === 0 || dayOfWeek === 6) {
-                        cell.classList.add('weekend');
-                    }
-
-                    // Check for events
-                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    if (events[dateStr]) {
-                        events[dateStr].forEach(event => {
-                            const eventDiv = document.createElement('div');
-                            eventDiv.classList.add('event');
-                            eventDiv.textContent = `${event.type}: ${event.description}`;
-                            cell.appendChild(eventDiv);
-                        });
-                    }
-
-                    row.appendChild(cell);
-
-                    // If the week is complete, start a new row
-                    if ((firstDay + day) % 7 === 0) {
-                        tbody.appendChild(row);
-                        row = document.createElement('tr');
-                    }
-                }
-
+            // If the week is complete, start a new row
+            if ((firstDay + day) % 7 === 0) {
                 tbody.appendChild(row);
-                table.appendChild(tbody);
-
-                monthDiv.appendChild(table);
-                calendarDiv.appendChild(monthDiv);
+                row = document.createElement('tr');
             }
         }
 
-        generateCalendar(2025);
+        tbody.appendChild(row);
+        table.appendChild(tbody);
+
+        monthDiv.appendChild(table);
+        calendarDiv.appendChild(monthDiv);
+    }
+}
+
+generateCalendar(2025);
     </script>
 </body>
 </html>
