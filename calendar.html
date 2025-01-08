@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 Calendar with Events</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            padding: 20px;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+        .month {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .month h2 {
+            margin-bottom: 10px;
+            font-size: 24px;
+            color: #4A90E2;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #4A90E2;
+            color: white;
+        }
+        td {
+            border: 1px solid #ddd;
+            height: 40px;
+            position: relative;
+        }
+        .event {
+            font-size: 12px;
+            color: #f00;
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+        }
+        .weekend {
+            background-color: #f0f8ff;
+        }
+        @media (max-width: 768px) {
+            .calendar {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>2025 Calendar with Events</h1>
+    <div class="calendar" id="calendar"></div>
+
+    <script>
+        const months = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const calendarDiv = document.getElementById('calendar');
+
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Eedoy_TGL2jFEc4n9zAdeh8RbS-fdUfD4ZxomWLMKIA/edit';
+        const sheetId = sheetUrl.split('/')[5];
+        const apiUrl = `https://spreadsheets.google.com/feeds/cells/${sheetId}/1/public/full?alt=json`;
+
+        async function fetchEvents() {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            const entries = data.feed.entry;
+            const events = {};
+
+            for (let i = 4; i < entries.length; i += 4) {
+                const date = entries[i - 3].gs$cell.$t;
+                const type = entries[i - 1].gs$cell.$t;
+                const description = entries[i].gs$cell.$t;
+
+                if (!events[date]) {
+                    events[date] = [];
+                }
+
+                events[date].push({ type, description });
+            }
+
+            return events;
+        }
+
+        async function generateCalendar(year) {
+            const events = await fetchEvents();
+
+            for (let month = 0; month < 12; month++) {
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                const monthDiv = document.createElement('div');
+                monthDiv.classList.add('month');
+
+                const monthTitle = document.createElement('h2');
+                monthTitle.textContent = `${months[month]} ${year}`;
+                monthDiv.appendChild(monthTitle);
+
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                const tr = document.createElement('tr');
+
+                days.forEach(day => {
+                    const th = document.createElement('th');
+                    th.textContent = day;
+                    tr.appendChild(th);
+                });
+
+                thead.appendChild(tr);
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                let row = document.createElement('tr');
+
+                // Fill initial empty cells
+                for (let i = 0; i < firstDay; i++) {
+                    const emptyCell = document.createElement('td');
+                    row.appendChild(emptyCell);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const cell = document.createElement('td');
+                    cell.textContent = day;
+
+                    // Highlight weekends
+                    const dayOfWeek = new Date(year, month, day).getDay();
+                    if (dayOfWeek === 0 || dayOfWeek === 6) {
+                        cell.classList.add('weekend');
+                    }
+
+                    // Check for events
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    if (events[dateStr]) {
+                        events[dateStr].forEach(event => {
+                            const eventDiv = document.createElement('div');
+                            eventDiv.classList.add('event');
+                            eventDiv.textContent = `${event.type}: ${event.description}`;
+                            cell.appendChild(eventDiv);
+                        });
+                    }
+
+                    row.appendChild(cell);
+
+                    // If the week is complete, start a new row
+                    if ((firstDay + day) % 7 === 0) {
+                        tbody.appendChild(row);
+                        row = document.createElement('tr');
+                    }
+                }
+
+                tbody.appendChild(row);
+                table.appendChild(tbody);
+
+                monthDiv.appendChild(table);
+                calendarDiv.appendChild(monthDiv);
+            }
+        }
+
+        generateCalendar(2025);
+    </script>
+</body>
+</html>
