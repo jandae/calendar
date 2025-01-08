@@ -98,7 +98,7 @@
         
                 if (date && description) {
                     // Extract month and day only from the date string (MM-DD format)
-                    const [month, day] = date.trim().split('-');
+                    const [month, day] = date.trim().split('/');
                     const formattedDate = `${month}-${day}`; // Use MM-DD format
                     if (!events[formattedDate]) {
                         events[formattedDate] = [];
