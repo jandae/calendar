@@ -83,7 +83,6 @@
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSpIW6ptzBpQ6R15IlmK-bVAl4zoZ4Iyg2FOzIpBoDWT2xVNPP2YGfOqp4uAwG5lix2IW02rOJNijDX/pub?output=csv';  // Replace with your Google Sheets CSV URL
 
         async function fetchEvents() {
-    const csvUrl = 'YOUR_CSV_URL_HERE';  // Replace with your Google Sheets CSV URL
     const response = await fetch(csvUrl);
     const csvText = await response.text();
 
