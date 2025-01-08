@@ -92,9 +92,6 @@
         
             rows.forEach(row => {
                 const [timestamp, date, type, description] = row.split(',');
-                
-                console.log(date);
-				console.log(description);
         
                 if (date && description) {
                     // Extract month and day only from the date string (MM-DD format)
@@ -103,7 +100,7 @@
                     if (!events[formattedDate]) {
                         events[formattedDate] = [];
                     }
-                    events[formattedDate].push(`${description.trim()}`);
+                    events[formattedDate].push(`${type.trim()}: ${description.trim()}`);
                 }
             });
             console.log(events);
