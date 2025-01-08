@@ -80,27 +80,26 @@
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const calendarDiv = document.getElementById('calendar');
 
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSpIW6ptzBpQ6R15IlmK-bVAl4zoZ4Iyg2FOzIpBoDWT2xVNPP2YGfOqp4uAwG5lix2IW02rOJNijDX/pubhtml';
-        const sheetId = sheetUrl.split('/')[5];
-        const apiUrl = `https://spreadsheets.google.com/feeds/cells/${sheetId}/1/public/full?alt=json`;
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSpIW6ptzBpQ6R15IlmK-bVAl4zoZ4Iyg2FOzIpBoDWT2xVNPP2YGfOqp4uAwG5lix2IW02rOJNijDX/pub?output=csv';  // Replace with your Google Sheets CSV URL
 
         async function fetchEvents() {
-            const response = await fetch(apiUrl);
-            const data = await response.json();
-            const entries = data.feed.entry;
+            const response = await fetch(csvUrl);
+            const csvText = await response.text();
+
+            // Parse CSV
             const events = {};
+            const rows = csvText.split('\n').slice(1); // Skip header row
 
-            for (let i = 4; i < entries.length; i += 4) {
-                const date = entries[i - 3].gs$cell.$t;
-                const type = entries[i - 1].gs$cell.$t;
-                const description = entries[i].gs$cell.$t;
+            rows.forEach(row => {
+                const [timestamp, date, type, description] = row.split(',');
 
-                if (!events[date]) {
-                    events[date] = [];
+                if (date && type && description) {
+                    if (!events[date.trim()]) {
+                        events[date.trim()] = [];
+                    }
+                    events[date.trim()].push({ type: type.trim(), description: description.trim() });
                 }
-
-                events[date].push({ type, description });
-            }
+            });
 
             return events;
         }
