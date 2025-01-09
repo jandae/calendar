@@ -1,0 +1,125 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+h1 {
+    text-align: center;
+    padding: 20px;
+}
+.month {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+}
+.month h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: #4A90E2;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Calendar Layout */
+.calendar {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Ensures all cells take equal space */
+}
+
+/* Equal-sized square cells */
+td {
+    position: relative;
+    width: 14.28%; /* Each cell takes up 1/7th of the row */
+    padding-top: 12.28%; /* Height matches width to maintain square aspect ratio */
+    border: 1px solid #ddd;
+    vertical-align: top;
+    text-align: center;
+}
+
+/* Headers - Keep a fixed size */
+th {
+    background-color: #4A90E2;
+    color: white;
+    padding: 10px 0; /* Standard padding for headers */
+    text-align: center;
+}
+
+/* Day numbers positioned at the top-left corner */
+td::before {
+    content: attr(data-day);
+    font-size: 24px; /* Make the date numbers bigger */
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+td {
+    font-size: 16px;
+    font-weight:bold;
+}
+
+/* Event display styling */
+.event {
+    color: #f00;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 5px 10px; /* Padding around the text */
+    border-radius: 5px; /* Rounded corners for the event background */
+}
+
+/* Birthday cells with light orange background */
+td.birthday-cell {
+    background-color: #ffe4b2;
+    color: #e67e22;
+    position: relative;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Birthday event text styling (centered inside the cell) */
+.event-birthday {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    color: #e67e22;
+    text-align: center;
+}
+
+
+/* Light red background for the entire cell with an event */
+td.event-cell {
+    background-color: #ffcccc; /* Light red background for the whole cell */
+}
+
+/* Weekend background */
+.weekend {
+    background-color: #f0f8ff;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+    .calendar {
+        grid-template-columns: 1fr;
+    }
+}

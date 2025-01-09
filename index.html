@@ -4,116 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2025 Calendar with Events</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        h1 {
-            text-align: center;
-            padding: 20px;
-        }
-        .month {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-        }
-        .month h2 {
-            margin-bottom: 10px;
-            font-size: 24px;
-            color: #4A90E2;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 20px;
-            text-align: center;
-        }
-        th {
-            background-color: #4A90E2;
-            color: white;
-        }
-        
-        /* Calendar Layout */
-        .calendar {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            padding: 20px;
-        }
-
-        /* Table Styling */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed; /* Ensures all cells take equal space */
-        }
-
-        /* Equal-sized square cells */
-        td {
-            position: relative;
-            width: 14.28%; /* Each cell takes up 1/7th of the row */
-            padding-top: 12.28%; /* Height matches width to maintain square aspect ratio */
-            border: 1px solid #ddd;
-            vertical-align: top;
-            text-align: center;
-        }
-
-        /* Headers - Keep a fixed size */
-        th {
-            background-color: #4A90E2;
-            color: white;
-            padding: 10px 0; /* Standard padding for headers */
-            text-align: center;
-        }
-
-        /* Day numbers positioned at the top-left corner */
-        td::before {
-            content: attr(data-day);
-            font-size: 24px; /* Make the date numbers bigger */
-            font-weight: bold;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
-
-        /* Event display styling */
-        .event {
-            font-size: 16px;
-            color: #f00;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            padding: 5px 10px; /* Padding around the text */
-            border-radius: 5px; /* Rounded corners for the event background */
-        }
-
-        /* Light red background for the entire cell with an event */
-        td.event-cell {
-            background-color: #ffcccc; /* Light red background for the whole cell */
-        }
-
-        /* Weekend background */
-        .weekend {
-            background-color: #f0f8ff;
-        }
-
-        /* Responsive layout for smaller screens */
-        @media (max-width: 768px) {
-            .calendar {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="styles.css"> <!-- Link to the external CSS file -->
 </head>
 <body>
     <h1>2025 Calendar with Events</h1>
@@ -159,26 +50,18 @@
                         events[formattedDate] = [];
                     }
 
-                    // Handle Birthday events
-                    if (type.trim().toLowerCase() === 'birthday' && year) {
-                        const age = new Date().getFullYear() - parseInt(year.trim());
-                        events[formattedDate].push(`${description.trim()} (${age})`);
-                    }
-                    // Handle Anniversary events
-                    else if (type.trim().toLowerCase() === 'anniversary' && year) {
-                        const years = new Date().getFullYear() - parseInt(year.trim());
-                        const yearLabel = years === 1 ? 'year' : 'years';
-                        events[formattedDate].push(`${description.trim()} (${years} ${yearLabel})`);
-                    }
-                    // Handle other event types
-                    else {
-                        events[formattedDate].push(`${type.trim()}: ${description.trim()}`);
-                    }
+                    // Handle Birthday and other events
+                    events[formattedDate].push({
+                        type: type.trim().toLowerCase(),
+                        description: description.trim(),
+                        year: year ? parseInt(year.trim()) : null,
+                    });
                 }
             });
 
             return events;
         }
+
         async function generateCalendar(year) {
             const events = await fetchEvents();
 
@@ -228,14 +111,29 @@
                     // Match events using normalized date format
                     const normalizedDate = normalizeDate(month + 1, day);
                     if (events[normalizedDate]) {
-                        // Add the event-cell class to change the background color
-                        cell.classList.add('event-cell');
-
                         events[normalizedDate].forEach(event => {
-                            const eventDiv = document.createElement('div');
-                            eventDiv.classList.add('event');
-                            eventDiv.textContent = event;
-                            cell.appendChild(eventDiv);
+                            if (event.type === 'birthday' || event.type === 'anniversary') {
+                                cell.classList.add('birthday-cell');
+
+                                const eventDiv = document.createElement('div');
+                                eventDiv.classList.add('event-birthday');
+
+                                if (event.type === 'birthday') {
+                                    const age = event.year ? ` (${year - event.year})` : '';
+                                    eventDiv.textContent = `${event.description}${age}`;
+                                } else if (event.type === 'anniversary') {
+                                    const years = event.year ? `${year - event.year} year${(year - event.year) > 1 ? 's' : ''}` : '';
+                                    eventDiv.textContent = `${event.description} (${years})`;
+                                }
+                                cell.appendChild(eventDiv);
+                            } else {
+                                cell.classList.add('event-cell');
+
+                                const eventDiv = document.createElement('div');
+                                eventDiv.classList.add('event');
+                                eventDiv.textContent = `${event.description}`;
+                                cell.appendChild(eventDiv);
+                            }
                         });
                     }
 
