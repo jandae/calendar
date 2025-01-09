@@ -42,71 +42,77 @@
         }
         
         /* Calendar Layout */
-/* Calendar Layout */
-.calendar {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 20px;
-}
+        .calendar {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
 
-/* Table Styling */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed; /* Ensures all cells take equal space */
-}
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* Ensures all cells take equal space */
+        }
 
-/* Equal-sized square cells */
-td {
-    position: relative;
-    width: 14.28%; /* Each cell takes up 1/7th of the row */
-    padding-top: 14.28%; /* Height matches width to maintain square aspect ratio */
-    border: 1px solid #ddd;
-    vertical-align: top;
-    text-align: center;
-}
+        /* Equal-sized square cells */
+        td {
+            position: relative;
+            width: 14.28%; /* Each cell takes up 1/7th of the row */
+            padding-top: 12.28%; /* Height matches width to maintain square aspect ratio */
+            border: 1px solid #ddd;
+            vertical-align: top;
+            text-align: center;
+        }
 
-/* Headers - Keep a fixed size */
-th {
-    background-color: #4A90E2;
-    color: white;
-    padding: 10px 0; /* Standard padding for headers */
-    text-align: center;
-}
+        /* Headers - Keep a fixed size */
+        th {
+            background-color: #4A90E2;
+            color: white;
+            padding: 10px 0; /* Standard padding for headers */
+            text-align: center;
+        }
 
-/* Day numbers positioned at the top-left corner */
-td::before {
-    content: attr(data-day);
-    font-size: 14px;
-    font-weight: bold;
-    position: absolute;
-    top: 5px;
-    left: 5px;
-}
+        /* Day numbers positioned at the top-left corner */
+        td::before {
+            content: attr(data-day);
+            font-size: 24px; /* Make the date numbers bigger */
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
 
-/* Event display styling */
-.event {
-    font-size: 12px;
-    color: #f00;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-}
+        /* Event display styling */
+        .event {
+            font-size: 16px;
+            color: #f00;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            padding: 5px 10px; /* Padding around the text */
+            border-radius: 5px; /* Rounded corners for the event background */
+        }
 
-/* Weekend background */
-.weekend {
-    background-color: #f0f8ff;
-}
+        /* Light red background for the entire cell with an event */
+        td.event-cell {
+            background-color: #ffcccc; /* Light red background for the whole cell */
+        }
 
-/* Responsive layout for smaller screens */
-@media (max-width: 768px) {
-    .calendar {
-        grid-template-columns: 1fr;
-    }
-}
+        /* Weekend background */
+        .weekend {
+            background-color: #f0f8ff;
+        }
+
+        /* Responsive layout for smaller screens */
+        @media (max-width: 768px) {
+            .calendar {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -222,6 +228,9 @@ td::before {
                     // Match events using normalized date format
                     const normalizedDate = normalizeDate(month + 1, day);
                     if (events[normalizedDate]) {
+                        // Add the event-cell class to change the background color
+                        cell.classList.add('event-cell');
+
                         events[normalizedDate].forEach(event => {
                             const eventDiv = document.createElement('div');
                             eventDiv.classList.add('event');
