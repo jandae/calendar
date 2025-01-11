@@ -189,7 +189,7 @@ td.event-cell {
 }
 
 .event-month {
-    flex: 1 0 23%; /* Adjust the width of each month container to be in rows, but still in columns */
+    flex: 1 0 25%; /* Adjust the width of each month container to be in rows, but still in columns */
     margin-bottom: 20px;
     box-sizing: border-box; /* Ensures padding and margin don't affect width calculation */
 }
@@ -203,12 +203,12 @@ td.event-cell {
 
 /* Style for event list items */
 /* Style for event list items */
-#event-list-container ul {
+.bullet-list ul {
     list-style-type: none; /* Remove default list styling */
     padding-left: 0; /* Remove left padding */
 }
 
-#event-list-container li {
+.bullet-list li {
     margin-bottom: 10px; /* Add space between list items */
     font-size: 16px; /* Keep the font size as it was */
     display: flex; /* Use flex to align items */
@@ -216,7 +216,7 @@ td.event-cell {
 }
 
 /* Apply custom bullet styles */
-#event-list-container li::before {
+.bullet-list li::before {
     content: ''; /* Create a custom bullet */
     width: 12px; /* Size of the square bullet */
     height: 12px; /* Size of the square bullet */
@@ -226,24 +226,45 @@ td.event-cell {
 }
 
 /* Event type specific styles */
-#event-list-container li.birthday::before {
+.bullet-list li.birthday::before {
     background-color: #7fbf7f; /* Darker green for birthday bullets */
 }
 
-#event-list-container li.holiday::before {
+.bullet-list li.holiday::before {
     background-color: #f0a0a0; /* Darker red for holiday bullets */
 }
 
-#event-list-container li.anniversary::before {
+.bullet-list li.anniversary::before {
     background-color: #a3a3e6; /* Darker purple for anniversary bullets */
 }
 
-#event-list-container li.working-holiday::before {
+.bullet-list li.working-holiday::before {
     background-color: #ffb84d; /* Darker orange for working holiday bullets */
 }
 
-#event-list-container li.general-event::before {
-    background-color: #e67e22; /* Darker orange for general event bullets */
+.bullet-list li.general-event::before {
+    background-color: #f2b37b; /* Darker orange for general event bullets */
+}
+
+#legend{
+    display: flex;
+    justify-content: space-between;
+}
+
+.event-multiple {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.event-multiple span:first-child {
+    padding-top: 10px;
+}
+
+.event-multiple span:last-child {
+    padding-bottom: 10px;
+    font-size: 12px;
 }
 
 
