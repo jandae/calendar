@@ -20,7 +20,7 @@ h1 {
 .month h2 {
     margin-bottom: 30px;
     font-size: 30px;
-    color: #2e7bd2;
+    color: #9e7a68;
 }
 
 table {
@@ -55,11 +55,11 @@ td {
 
 /* Headers - Keep a fixed size */
 th {
-    background-color: #2e7bd2;
+    background-color: #9e7a68;
     color: white;
     padding: 10px 0; /* Standard padding for headers */
     text-align: center;
-    border: 1px solid #2e7bd2; /* Set the border color to match the background */
+    border: 1px solid #9e7a68; /* Set the border color to match the background */
 }
 
 /* Day numbers positioned at the top-left corner */
@@ -199,6 +199,7 @@ td.event-cell {
 .event-month h3 {
     font-size: 1.2em;
     margin-top: 10px;
+    color: #9e7a68;
 }
 
 /* Style for event list items */
