@@ -112,26 +112,53 @@
                     const normalizedDate = normalizeDate(month + 1, day);
                     if (events[normalizedDate]) {
                         events[normalizedDate].forEach(event => {
-                            if (event.type === 'birthday' || event.type === 'anniversary') {
+                            if (event.type === 'birthday') {
                                 cell.classList.add('birthday-cell');
-
                                 const eventDiv = document.createElement('div');
                                 eventDiv.classList.add('event-birthday');
 
-                                if (event.type === 'birthday') {
-                                    const age = event.year ? ` (${year - event.year})` : '';
-                                    eventDiv.textContent = `${event.description}${age}`;
-                                } else if (event.type === 'anniversary') {
-                                    const years = event.year ? `${year - event.year} year${(year - event.year) > 1 ? 's' : ''}` : '';
-                                    eventDiv.textContent = `${event.description} (${years})`;
-                                }
+                                const descriptionSpan = document.createElement('span'); // Create a span for the description
+                                descriptionSpan.textContent = event.description; // Set the description text
+
+                                const ageSpan = document.createElement('span'); // Create a span for the age
+                                const age = event.year ? ` ${year - event.year} yo` : ''; // Calculate age
+                                ageSpan.textContent = age; // Set the text content of the age span
+
+                                // Append the description span and age span to the event div
+                                eventDiv.appendChild(descriptionSpan);
+                                eventDiv.appendChild(ageSpan);
+
+                                // Append the event div to the cell
+                                cell.appendChild(eventDiv);
+                            } else if (event.type === 'holiday') {
+                                cell.classList.add('holiday-cell');
+                                const eventDiv = document.createElement('div');
+                                eventDiv.classList.add('event-holiday');
+                                eventDiv.textContent = event.description;
+                                cell.appendChild(eventDiv);
+                            } else if (event.type === 'anniversary') {
+                                cell.classList.add('anniversary-cell');
+                                const eventDiv = document.createElement('div');
+                                eventDiv.classList.add('event-anniversary');
+
+                                const descriptionSpan = document.createElement('span'); // Create a span for the description
+                                descriptionSpan.textContent = event.description; // Set the description text
+
+                                const yearsSpan = document.createElement('span'); // Create a span for the years
+                                const years = event.year ? `${year - event.year} year${(year - event.year) > 1 ? 's' : ''}` : ''; // Calculate anniversary years
+                                yearsSpan.textContent = ` ${years}`; // Set the text content of the years span
+
+                                // Append the description span and years span to the event div
+                                eventDiv.appendChild(descriptionSpan);
+                                eventDiv.appendChild(yearsSpan);
+
+                                // Append the event div to the cell
                                 cell.appendChild(eventDiv);
                             } else {
-                                cell.classList.add('event-cell');
-
+                                cell.classList.add('event-cell'); // Add 'event-cell' class for general events
                                 const eventDiv = document.createElement('div');
-                                eventDiv.classList.add('event');
-                                eventDiv.textContent = `${event.description}`;
+                                eventDiv.classList.add('event'); // Add 'event' class for the event content
+                                eventDiv.textContent = event.description;
                                 cell.appendChild(eventDiv);
                             }
                         });
