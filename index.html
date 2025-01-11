@@ -187,57 +187,82 @@
 
                     const normalizedDate = normalizeDate(month + 1, day);
                     if (events[normalizedDate]) {
-                        events[normalizedDate].forEach(event => {
-                            if (event.type === 'birthday') {
-                                cell.classList.add('birthday-cell');
+                        const eventList = events[normalizedDate];
+                         if (eventList.length > 1) {
+                             // For multiple events, display each event with individual background colors
+                            eventList.forEach(event => {
                                 const eventDiv = document.createElement('div');
-                                eventDiv.classList.add('event-birthday');
-                                const descriptionSpan = document.createElement('span');
-                                descriptionSpan.textContent = event.description;
-
-                                const ageSpan = document.createElement('span');
-                                const age = event.year ? ` ${year - event.year} yo` : '';
-                                ageSpan.textContent = age;
-
-                                eventDiv.appendChild(descriptionSpan);
-                                eventDiv.appendChild(ageSpan);
-
-                                cell.appendChild(eventDiv);
-                            } else if (event.type === 'holiday') {
-                                cell.classList.add('holiday-cell');
-                                const eventDiv = document.createElement('div');
-                                eventDiv.classList.add('event-holiday');
                                 eventDiv.textContent = event.description;
-                                cell.appendChild(eventDiv);
-                            } else if (event.type === 'anniversary') {
-                                cell.classList.add('anniversary-cell');
-                                const eventDiv = document.createElement('div');
-                                eventDiv.classList.add('event-anniversary');
-                                const descriptionSpan = document.createElement('span');
-                                descriptionSpan.textContent = event.description;
+                                eventDiv.style.backgroundColor = eventTypeColors[event.type] || '#fff';
+                                eventDiv.style.marginBottom = '5px'; // Space between events
+                                eventDiv.style.padding = '2px';
+                                eventDiv.style.borderRadius = '4px';
 
-                                const yearsSpan = document.createElement('span');
-                                const years = event.year ? `${year - event.year} year${(year - event.year) > 1 ? 's' : ''}` : '';
-                                yearsSpan.textContent = ` ${years}`;
+                                if (event.year) {
+                                    const years = year - event.year;
+                                    if (event.type === 'birthday') {
+                                        eventDiv.textContent += ` (${years} yo)`;
+                                    } else if (event.type === 'anniversary') {
+                                        eventDiv.textContent += ` (${years} year${years > 1 ? 's' : ''})`;
+                                    }
+                                }
 
-                                eventDiv.appendChild(descriptionSpan);
-                                eventDiv.appendChild(yearsSpan);
+                                cell.appendChild(eventDiv);
+                            });
+                         }
+                         else {
+                             events[normalizedDate].forEach(event => {
+                                 if (event.type === 'birthday') {
+                                     cell.classList.add('birthday-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event-birthday');
+                                     const descriptionSpan = document.createElement('span');
+                                     descriptionSpan.textContent = event.description;
 
-                                cell.appendChild(eventDiv);
-                            } else if (event.type === 'working holiday') {
-                                cell.classList.add('working-holiday-cell');
-                                const eventDiv = document.createElement('div');
-                                eventDiv.classList.add('event-working-holiday');
-                                eventDiv.textContent = event.description;
-                                cell.appendChild(eventDiv);
-                            } else {
-                                cell.classList.add('event-cell');
-                                const eventDiv = document.createElement('div');
-                                eventDiv.classList.add('event');
-                                eventDiv.textContent = event.description;
-                                cell.appendChild(eventDiv);
-                            }
-                        });
+                                     const ageSpan = document.createElement('span');
+                                     const age = event.year ? ` ${year - event.year} yo` : '';
+                                     ageSpan.textContent = age;
+
+                                     eventDiv.appendChild(descriptionSpan);
+                                     eventDiv.appendChild(ageSpan);
+
+                                     cell.appendChild(eventDiv);
+                                 } else if (event.type === 'holiday') {
+                                     cell.classList.add('holiday-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event-holiday');
+                                     eventDiv.textContent = event.description;
+                                     cell.appendChild(eventDiv);
+                                 } else if (event.type === 'anniversary') {
+                                     cell.classList.add('anniversary-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event-anniversary');
+                                     const descriptionSpan = document.createElement('span');
+                                     descriptionSpan.textContent = event.description;
+
+                                     const yearsSpan = document.createElement('span');
+                                     const years = event.year ? `${year - event.year} year${(year - event.year) > 1 ? 's' : ''}` : '';
+                                     yearsSpan.textContent = ` ${years}`;
+
+                                     eventDiv.appendChild(descriptionSpan);
+                                     eventDiv.appendChild(yearsSpan);
+
+                                     cell.appendChild(eventDiv);
+                                 } else if (event.type === 'working holiday') {
+                                     cell.classList.add('working-holiday-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event-working-holiday');
+                                     eventDiv.textContent = event.description;
+                                     cell.appendChild(eventDiv);
+                                 } else {
+                                     cell.classList.add('event-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event');
+                                     eventDiv.textContent = event.description;
+                                     cell.appendChild(eventDiv);
+                                 }
+                             });
+                         }
                     }
 
                     row.appendChild(cell);
