@@ -39,68 +39,66 @@
             return `${month}-${day}`; // No padding for the month
         }
 
-       function displayEventList(events) {
-        eventListContainer.innerHTML = ''; // Clear previous list
+        function displayEventList(events) {
+            eventListContainer.innerHTML = ''; // Clear previous list
 
-        // Loop through all months
-        for (let month = 0; month < 12; month++) {
-            const monthKey = `${month + 1}`; // Month in "M" format, without padding
-            const monthEvents = Object.keys(events).filter(event => event.startsWith(monthKey));
+            // Loop through all months
+            for (let month = 0; month < 12; month++) {
+                const monthKey = `${month + 1}`; // Month in "M" format, without padding
+                const monthEvents = Object.keys(events).filter(event => event.split('-')[0] === monthKey); // Check for exact match on the month
 
-            if (monthEvents.length) {
-                const monthDiv = document.createElement('div');
-                monthDiv.classList.add('event-month');
+                if (monthEvents.length) {
+                    const monthDiv = document.createElement('div');
+                    monthDiv.classList.add('event-month');
 
-                const monthTitle = document.createElement('h3');
-                monthTitle.textContent = `${months[month]}`;
-                monthDiv.appendChild(monthTitle);
+                    const monthTitle = document.createElement('h3');
+                    monthTitle.textContent = `${months[month]}`;
+                    monthDiv.appendChild(monthTitle);
 
-                const ul = document.createElement('ul');
+                    const ul = document.createElement('ul');
 
-                monthEvents.forEach(eventKey => {
-                    events[eventKey].forEach(event => {
-                        const li = document.createElement('li');
-                        let text = `${event.description}`;
+                    monthEvents.forEach(eventKey => {
+                        events[eventKey].forEach(event => {
+                            const li = document.createElement('li');
+                            let text = `${event.description}`;
 
-                        // Add the day before the text
-                        const [month, day] = eventKey.split('-'); // Extract month and day
-                        const date = new Date(2025, month - 1, day); // Create date object (year is 2025)
+                            // Add the day before the text
+                            const [month, day] = eventKey.split('-'); // Extract month and day
+                            const date = new Date(2025, month - 1, day); // Create date object (year is 2025)
 
-                        // Get the day of the week in shorthand (e.g., "Mon", "Tue")
-                        const dayOfWeek = days[date.getDay()];
+                            // Get the day of the week in shorthand (e.g., "Mon", "Tue")
+                            const dayOfWeek = days[date.getDay()];
 
-                        text = `${day} (${dayOfWeek}) - ${text}`;
+                            text = `${day} (${dayOfWeek}) - ${text}`;
 
-                        // Add age for birthdays
-                        if (event.type === 'birthday' && event.year) {
-                            const age = new Date().getFullYear() - event.year;
-                            text += ` - ${age} yo`;
-                        }
-                        // Add years for anniversaries
-                        else if (event.type === 'anniversary' && event.year) {
-                            const years = new Date().getFullYear() - event.year;
-                            text += ` - ${years} year${years > 1 ? 's' : ''}`;
-                        }
+                            // Add age for birthdays
+                            if (event.type === 'birthday' && event.year) {
+                                const age = new Date().getFullYear() - event.year;
+                                text += ` - ${age} yo`;
+                            }
+                            // Add years for anniversaries
+                            else if (event.type === 'anniversary' && event.year) {
+                                const years = new Date().getFullYear() - event.year;
+                                text += ` - ${years} year${years > 1 ? 's' : ''}`;
+                            }
 
-                        // Add event type as a class to li
-                        if (event.type === 'event') {
-                            li.classList.add('general-event'); // For non-specific events
-                        } else {
-                            li.classList.add(event.type); // For specific event types
-                        }
+                            // Add event type as a class to li
+                            if (event.type === 'event') {
+                                li.classList.add('general-event'); // For non-specific events
+                            } else {
+                                li.classList.add(event.type); // For specific event types
+                            }
 
-                        li.textContent = text;
-                        ul.appendChild(li);
+                            li.textContent = text;
+                            ul.appendChild(li);
+                        });
                     });
-                });
 
-                monthDiv.appendChild(ul);
-                eventListContainer.appendChild(monthDiv);
+                    monthDiv.appendChild(ul);
+                    eventListContainer.appendChild(monthDiv);
+                }
             }
         }
-    }
-
-
 
         async function fetchEvents() {
             const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSpIW6ptzBpQ6R15IlmK-bVAl4zoZ4Iyg2FOzIpBoDWT2xVNPP2YGfOqp4uAwG5lix2IW02rOJNijDX/pub?output=csv');
@@ -118,15 +116,20 @@
                     const [month, day, year] = date.trim().split('/');
                     const formattedDate = `${month}-${day}`; // No padding for the month
 
+                    // Check if the event already exists for the specific date and description to prevent duplicates
                     if (!events[formattedDate]) {
                         events[formattedDate] = [];
                     }
 
-                    events[formattedDate].push({
-                        type: type.trim().toLowerCase(),
-                        description: description.trim(),
-                        year: year ? parseInt(year.trim()) : null,
-                    });
+                    const eventExists = events[formattedDate].some(event => event.description === description.trim());
+
+                    if (!eventExists) {
+                        events[formattedDate].push({
+                            type: type.trim().toLowerCase(),
+                            description: description.trim(),
+                            year: year ? parseInt(year.trim()) : null,
+                        });
+                    }
                 }
             });
 
@@ -134,6 +137,7 @@
 
             return events;
         }
+
 
         async function generateCalendar(year) {
             const events = await fetchEvents();
