@@ -22,7 +22,7 @@
 
     <div class="calendar" id="calendar"></div>
 
-   <script>
+    <script>
         const months = [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
@@ -30,7 +30,7 @@
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const calendarDiv = document.getElementById('calendar');
         const eventListContainer = document.getElementById('event-list-container');
-        const eventLegend = document.getElementById('legend'); // Reference to the legend
+        const eventLegend = document.getElementById('legend');
 
         const eventTypeColors = {
             'birthday': '#edffe3',
@@ -55,7 +55,13 @@
             legendItems.forEach(item => {
                 const type = item.className === 'general-event' ? 'event': item.className;
                 const count = eventCounts[type] || 0; // Default to 0 if no events of that type
-                item.textContent = `${capitalizeFirstLetter(type)} (${count})`;
+                const legendSpan = document.createElement('span');
+                legendSpan.style.fontWeight = "bold";
+                legendSpan.style.marginLeft = "5px";
+                item.textContent = `${capitalizeFirstLetter(type)}`;
+                legendSpan.textContent = `(${count})`;
+
+                item.appendChild(legendSpan);
             });
         }
 
@@ -103,24 +109,21 @@
                             if (event.type === 'birthday' && event.year) {
                                 const age = new Date().getFullYear() - event.year;
                                 text += ` - ${age} yo`;
-                                eventCounts['birthday']++; // Increment birthday count
+                                eventCounts['birthday']++;
                             }
                             // Add years for anniversaries
                             else if (event.type === 'anniversary' && event.year) {
                                 const years = new Date().getFullYear() - event.year;
                                 text += ` - ${years} year${years > 1 ? 's' : ''}`;
-                                eventCounts['anniversary']++; // Increment anniversary count
+                                eventCounts['anniversary']++;
                             }
                             else if (event.type === 'holiday') {
                                 eventCounts['holiday']++; // Increment holiday count
                             }
-                            else if (event.type === 'event') {
-                                eventCounts['event']++; // Increment general event count
-                            }
-
                             // Add event type as a class to li
                             if (event.type === 'event') {
                                 li.classList.add('general-event'); // For non-specific events
+                                eventCounts['event']++;
                             } else {
                                 li.classList.add(event.type); // For specific event types
                             }
@@ -135,7 +138,6 @@
                 }
             }
 
-            // Update the event counts in the legend after all events are processed
             updateEventLegend(eventCounts);
         }
 
@@ -177,8 +179,11 @@
             return events;
         }
 
+
         async function generateCalendar(year) {
             const events = await fetchEvents();
+
+            console.log("Events for Calendar:", events);
 
             for (let month = 0; month < 12; month++) {
                 const firstDay = new Date(year, month, 1).getDay();
@@ -224,20 +229,91 @@
                     const normalizedDate = normalizeDate(month + 1, day);
                     if (events[normalizedDate]) {
                         const eventList = events[normalizedDate];
-                        eventList.forEach(event => {
-                            const eventDiv = document.createElement('div');
-                            const descriptionSpan = document.createElement('span');
-                            descriptionSpan.textContent = event.description;
+                         if (eventList.length > 1) {
+                             // For multiple events, display each event with individual background colors
+                            eventList.forEach(event => {
+                                const eventDiv = document.createElement('div');
+                                const descriptionSpan = document.createElement('span');
+                                descriptionSpan.textContent = event.description;
+                                const ageSpan = document.createElement('span');
 
-                            eventDiv.style.backgroundColor = eventTypeColors[event.type] || '#fff';
-                            eventDiv.style.marginBottom = '5px'; // Space between events
-                            eventDiv.style.padding = '2px';
-                            eventDiv.style.borderRadius = '4px';
-                            eventDiv.classList.add('event-multiple');
+                                eventDiv.style.backgroundColor = eventTypeColors[event.type] || '#fff';
+                                eventDiv.style.marginBottom = '5px'; // Space between events
+                                eventDiv.style.padding = '2px';
+                                eventDiv.style.borderRadius = '4px';
+                                eventDiv.classList.add('event-multiple');
 
-                            eventDiv.appendChild(descriptionSpan);
-                            cell.appendChild(eventDiv);
-                        });
+                                if (event.year) {
+                                    const years = year - event.year;
+                                    if (event.type === 'birthday') {
+                                        const age = event.year ? ` ${year - event.year} yo` : '';
+                                        ageSpan.textContent = age;
+
+                                    } else if (event.type === 'anniversary') {
+                                        const years = event.year ? `${year - event.year} year${(year - event.year) > 1 ? 's' : ''}` : '';
+                                        ageSpan.textContent = years;
+                                    }
+                                }
+
+                                eventDiv.appendChild(descriptionSpan);
+                                eventDiv.appendChild(ageSpan);
+
+                                cell.appendChild(eventDiv);
+                            });
+                         }
+                         else {
+                             events[normalizedDate].forEach(event => {
+                                 if (event.type === 'birthday') {
+                                     cell.classList.add('birthday-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event-birthday');
+                                     const descriptionSpan = document.createElement('span');
+                                     eventDiv.textContent = `${event.description}`;
+
+                                     const ageSpan = document.createElement('span');
+                                     const age = event.year ? ` ${year - event.year} yo` : '';
+                                     ageSpan.textContent = age;
+
+                                     eventDiv.appendChild(descriptionSpan);
+                                     eventDiv.appendChild(ageSpan);
+
+                                     cell.appendChild(eventDiv);
+                                 } else if (event.type === 'holiday') {
+                                     cell.classList.add('holiday-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event-holiday');
+                                     eventDiv.textContent = `${event.description}`;
+                                     cell.appendChild(eventDiv);
+                                 } else if (event.type === 'anniversary') {
+                                     cell.classList.add('anniversary-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event-anniversary');
+                                     const descriptionSpan = document.createElement('span');
+                                     descriptionSpan.textContent = event.description;
+
+                                     const yearsSpan = document.createElement('span');
+                                     const years = event.year ? `${year - event.year} year${(year - event.year) > 1 ? 's' : ''}` : '';
+                                     yearsSpan.textContent = ` ${years}`;
+
+                                     eventDiv.appendChild(descriptionSpan);
+                                     eventDiv.appendChild(yearsSpan);
+
+                                     cell.appendChild(eventDiv);
+                                 } else if (event.type === 'working holiday') {
+                                     cell.classList.add('working-holiday-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event-working-holiday');
+                                     eventDiv.textContent = event.description;
+                                     cell.appendChild(eventDiv);
+                                 } else {
+                                     cell.classList.add('event-cell');
+                                     const eventDiv = document.createElement('div');
+                                     eventDiv.classList.add('event');
+                                     eventDiv.textContent = event.description;
+                                     cell.appendChild(eventDiv);
+                                 }
+                             });
+                         }
                     }
 
                     row.appendChild(cell);
@@ -253,12 +329,11 @@
                 monthDiv.appendChild(table);
                 calendarDiv.appendChild(monthDiv);
             }
-
+            console.log(events)
             displayEventList(events);
         }
 
         generateCalendar(2025);
     </script>
-
 </body>
 </html>
