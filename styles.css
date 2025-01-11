@@ -4,21 +4,25 @@ body {
     margin: 0;
     padding: 0;
 }
+
 h1 {
     text-align: center;
     padding: 20px;
 }
+
 .month {
     background-color: #fff;
     border-radius: 10px;
     padding: 20px;
     text-align: center;
 }
+
 .month h2 {
     margin-bottom: 30px;
     font-size: 30px;
     color: #2e7bd2;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -58,7 +62,6 @@ th {
     border: 1px solid #2e7bd2; /* Set the border color to match the background */
 }
 
-
 /* Day numbers positioned at the top-left corner */
 td::before {
     content: attr(data-day);
@@ -71,7 +74,7 @@ td::before {
 
 td {
     font-size: 16px;
-    font-weight:bold;
+    font-weight: bold;
 }
 
 /* Event display styling */
@@ -158,15 +161,99 @@ td.event-cell {
     margin-left: 5px; /* Add space between description and age/years */
 }
 
-
 /* Weekend background */
 .weekend {
     background-color: #f0f8ff;
 }
 
+/* Event list section - Matching width with calendar */
+.event-list {
+    width: 100%;
+    max-width: 1200px;  /* Same max-width as calendar */
+    margin: 0 auto;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.event-list h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+/* Event list layout */
+#event-list-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.event-month {
+    flex: 1 0 23%; /* Adjust the width of each month container to be in rows, but still in columns */
+    margin-bottom: 20px;
+    box-sizing: border-box; /* Ensures padding and margin don't affect width calculation */
+}
+
+
+
+.event-month h3 {
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+/* Style for event list items */
+/* Style for event list items */
+#event-list-container ul {
+    list-style-type: none; /* Remove default list styling */
+    padding-left: 0; /* Remove left padding */
+}
+
+#event-list-container li {
+    margin-bottom: 10px; /* Add space between list items */
+    font-size: 16px; /* Keep the font size as it was */
+    display: flex; /* Use flex to align items */
+    align-items: center; /* Align the bullet point with the text */
+}
+
+/* Apply custom bullet styles */
+#event-list-container li::before {
+    content: ''; /* Create a custom bullet */
+    width: 12px; /* Size of the square bullet */
+    height: 12px; /* Size of the square bullet */
+    margin-right: 10px; /* Space between bullet and text */
+    display: inline-block; /* Keep it inline with the text */
+    background-color: currentColor; /* Set the bullet color based on the text color */
+}
+
+/* Event type specific styles */
+#event-list-container li.birthday::before {
+    background-color: #7fbf7f; /* Darker green for birthday bullets */
+}
+
+#event-list-container li.holiday::before {
+    background-color: #f0a0a0; /* Darker red for holiday bullets */
+}
+
+#event-list-container li.anniversary::before {
+    background-color: #a3a3e6; /* Darker purple for anniversary bullets */
+}
+
+#event-list-container li.working-holiday::before {
+    background-color: #ffb84d; /* Darker orange for working holiday bullets */
+}
+
+#event-list-container li.general-event::before {
+    background-color: #e67e22; /* Darker orange for general event bullets */
+}
+
+
 /* Responsive layout for smaller screens */
 @media (max-width: 768px) {
     .calendar {
         grid-template-columns: 1fr;
+    }
+
+    .event-list-container {
+        grid-template-columns: 1fr; /* Stack events on top of each other on small screens */
     }
 }

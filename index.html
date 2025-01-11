@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2025 Calendar with Events</title>
-    <link rel="stylesheet" type="text/css" href="styles.css"> <!-- Link to the external CSS file -->
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <h1>2025 Calendar with Events</h1>
+    <!-- New Section for Event List by Month -->
+    <div class="event-list" id="event-list">
+        <div id="event-list-container"></div>
+    </div>
+
     <div class="calendar" id="calendar"></div>
 
     <script>
@@ -17,40 +21,107 @@
         ];
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const calendarDiv = document.getElementById('calendar');
+        const eventListContainer = document.getElementById('event-list-container');
 
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSpIW6ptzBpQ6R15IlmK-bVAl4zoZ4Iyg2FOzIpBoDWT2xVNPP2YGfOqp4uAwG5lix2IW02rOJNijDX/pub?output=csv';  // Replace with your Google Sheets CSV URL
+        const eventTypeColors = {
+            'birthday': '#edffe3',
+            'holiday': '#ffeae7',
+            'anniversary': '#dfe1fa',
+            'working holiday': '#ffe0b2',
+            'event': '#ffcc80'
+        };
 
-        // Helper function to normalize date format to match the events
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
         function normalizeDate(month, day) {
-            return `${parseInt(month)}-${parseInt(day)}`; // Convert to M-D format
+            return `${month}-${day}`; // No padding for the month
         }
 
-        // Function to calculate age based on birth year
-        function calculateAge(birthYear) {
-            const currentYear = new Date().getFullYear();
-            return currentYear - birthYear;
+       function displayEventList(events) {
+        eventListContainer.innerHTML = ''; // Clear previous list
+
+        // Loop through all months
+        for (let month = 0; month < 12; month++) {
+            const monthKey = `${month + 1}`; // Month in "M" format, without padding
+            const monthEvents = Object.keys(events).filter(event => event.startsWith(monthKey));
+
+            if (monthEvents.length) {
+                const monthDiv = document.createElement('div');
+                monthDiv.classList.add('event-month');
+
+                const monthTitle = document.createElement('h3');
+                monthTitle.textContent = `${months[month]}`;
+                monthDiv.appendChild(monthTitle);
+
+                const ul = document.createElement('ul');
+
+                monthEvents.forEach(eventKey => {
+                    events[eventKey].forEach(event => {
+                        const li = document.createElement('li');
+                        let text = `${event.description}`;
+
+                        // Add the day before the text
+                        const [month, day] = eventKey.split('-'); // Extract month and day
+                        const date = new Date(2025, month - 1, day); // Create date object (year is 2025)
+
+                        // Get the day of the week in shorthand (e.g., "Mon", "Tue")
+                        const dayOfWeek = days[date.getDay()];
+
+                        text = `${day} (${dayOfWeek}) - ${text}`;
+
+                        // Add age for birthdays
+                        if (event.type === 'birthday' && event.year) {
+                            const age = new Date().getFullYear() - event.year;
+                            text += ` - ${age} yo`;
+                        }
+                        // Add years for anniversaries
+                        else if (event.type === 'anniversary' && event.year) {
+                            const years = new Date().getFullYear() - event.year;
+                            text += ` - ${years} year${years > 1 ? 's' : ''}`;
+                        }
+
+                        // Add event type as a class to li
+                        if (event.type === 'event') {
+                            li.classList.add('general-event'); // For non-specific events
+                        } else {
+                            li.classList.add(event.type); // For specific event types
+                        }
+
+                        li.textContent = text;
+                        ul.appendChild(li);
+                    });
+                });
+
+                monthDiv.appendChild(ul);
+                eventListContainer.appendChild(monthDiv);
+            }
         }
+    }
+
+
 
         async function fetchEvents() {
-            const response = await fetch(csvUrl);
+            const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSpIW6ptzBpQ6R15IlmK-bVAl4zoZ4Iyg2FOzIpBoDWT2xVNPP2YGfOqp4uAwG5lix2IW02rOJNijDX/pub?output=csv');
             const csvText = await response.text();
 
-            // Parse CSV rows
             const events = {};
-            const rows = csvText.split('\n').slice(1); // Skip header row
+            const rows = csvText.split('\n').slice(1);
+
+            console.log("Fetched CSV Data:", csvText);  // Log raw CSV data
 
             rows.forEach(row => {
                 const [timestamp, date, type, description] = row.split(',');
 
                 if (date && description) {
                     const [month, day, year] = date.trim().split('/');
-                    const formattedDate = `${parseInt(month)}-${parseInt(day)}`; // Normalize to M-D format
+                    const formattedDate = `${month}-${day}`; // No padding for the month
 
                     if (!events[formattedDate]) {
                         events[formattedDate] = [];
                     }
 
-                    // Handle Birthday and other events
                     events[formattedDate].push({
                         type: type.trim().toLowerCase(),
                         description: description.trim(),
@@ -59,11 +130,15 @@
                 }
             });
 
+            console.log("Parsed Events:", events);  // Log events data after parsing
+
             return events;
         }
 
         async function generateCalendar(year) {
             const events = await fetchEvents();
+
+            console.log("Events for Calendar:", events);
 
             for (let month = 0; month < 12; month++) {
                 const firstDay = new Date(year, month, 1).getDay();
@@ -92,7 +167,6 @@
                 const tbody = document.createElement('tbody');
                 let row = document.createElement('tr');
 
-                // Fill initial empty cells
                 for (let i = 0; i < firstDay; i++) {
                     const emptyCell = document.createElement('td');
                     row.appendChild(emptyCell);
@@ -102,13 +176,11 @@
                     const cell = document.createElement('td');
                     cell.setAttribute('data-day', day);
 
-                    // Highlight weekends
                     const dayOfWeek = new Date(year, month, day).getDay();
                     if (dayOfWeek === 0 || dayOfWeek === 6) {
                         cell.classList.add('weekend');
                     }
 
-                    // Match events using normalized date format
                     const normalizedDate = normalizeDate(month + 1, day);
                     if (events[normalizedDate]) {
                         events[normalizedDate].forEach(event => {
@@ -116,19 +188,16 @@
                                 cell.classList.add('birthday-cell');
                                 const eventDiv = document.createElement('div');
                                 eventDiv.classList.add('event-birthday');
+                                const descriptionSpan = document.createElement('span');
+                                descriptionSpan.textContent = event.description;
 
-                                const descriptionSpan = document.createElement('span'); // Create a span for the description
-                                descriptionSpan.textContent = event.description; // Set the description text
+                                const ageSpan = document.createElement('span');
+                                const age = event.year ? ` ${year - event.year} yo` : '';
+                                ageSpan.textContent = age;
 
-                                const ageSpan = document.createElement('span'); // Create a span for the age
-                                const age = event.year ? ` ${year - event.year} yo` : ''; // Calculate age
-                                ageSpan.textContent = age; // Set the text content of the age span
-
-                                // Append the description span and age span to the event div
                                 eventDiv.appendChild(descriptionSpan);
                                 eventDiv.appendChild(ageSpan);
 
-                                // Append the event div to the cell
                                 cell.appendChild(eventDiv);
                             } else if (event.type === 'holiday') {
                                 cell.classList.add('holiday-cell');
@@ -140,24 +209,27 @@
                                 cell.classList.add('anniversary-cell');
                                 const eventDiv = document.createElement('div');
                                 eventDiv.classList.add('event-anniversary');
+                                const descriptionSpan = document.createElement('span');
+                                descriptionSpan.textContent = event.description;
 
-                                const descriptionSpan = document.createElement('span'); // Create a span for the description
-                                descriptionSpan.textContent = event.description; // Set the description text
+                                const yearsSpan = document.createElement('span');
+                                const years = event.year ? `${year - event.year} year${(year - event.year) > 1 ? 's' : ''}` : '';
+                                yearsSpan.textContent = ` ${years}`;
 
-                                const yearsSpan = document.createElement('span'); // Create a span for the years
-                                const years = event.year ? `${year - event.year} year${(year - event.year) > 1 ? 's' : ''}` : ''; // Calculate anniversary years
-                                yearsSpan.textContent = ` ${years}`; // Set the text content of the years span
-
-                                // Append the description span and years span to the event div
                                 eventDiv.appendChild(descriptionSpan);
                                 eventDiv.appendChild(yearsSpan);
 
-                                // Append the event div to the cell
+                                cell.appendChild(eventDiv);
+                            } else if (event.type === 'working holiday') {
+                                cell.classList.add('working-holiday-cell');
+                                const eventDiv = document.createElement('div');
+                                eventDiv.classList.add('event-working-holiday');
+                                eventDiv.textContent = event.description;
                                 cell.appendChild(eventDiv);
                             } else {
-                                cell.classList.add('event-cell'); // Add 'event-cell' class for general events
+                                cell.classList.add('event-cell');
                                 const eventDiv = document.createElement('div');
-                                eventDiv.classList.add('event'); // Add 'event' class for the event content
+                                eventDiv.classList.add('event');
                                 eventDiv.textContent = event.description;
                                 cell.appendChild(eventDiv);
                             }
@@ -166,7 +238,6 @@
 
                     row.appendChild(cell);
 
-                    // If the week is complete, start a new row
                     if ((firstDay + day) % 7 === 0) {
                         tbody.appendChild(row);
                         row = document.createElement('tr');
@@ -175,10 +246,11 @@
 
                 tbody.appendChild(row);
                 table.appendChild(tbody);
-
                 monthDiv.appendChild(table);
                 calendarDiv.appendChild(monthDiv);
             }
+            console.log(events)
+            displayEventList(events);
         }
 
         generateCalendar(2025);
