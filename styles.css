@@ -108,6 +108,7 @@ th {
     padding: 10px 0; /* Standard padding for headers */
     text-align: center;
     border: 1px solid #9e7a68; /* Set the border color to match the background */
+    font-size: 30px;
 }
 
 /* Day numbers positioned at the top-left corner */
@@ -360,5 +361,12 @@ h2.month-num {
 
     .event-list-container {
         grid-template-columns: 1fr; /* Stack events on top of each other on small screens */
+    }
+}
+
+@media print {
+    .calendar .month {
+        page-break-after: always;
+        break-after: page;
     }
 }
