@@ -68,7 +68,7 @@ table {
 .calendar .month-num-bg {
     position: absolute;
     opacity: 0.1;
-    font-size: 30em;
+    font-size: 60em;
     text-align: center;
 }
 
@@ -95,10 +95,12 @@ th, td {
 td {
     position: relative;
     width: 14.28%; /* Each cell takes up 1/7th of the row */
-    padding-top: 12.28%; /* Height matches width to maintain square aspect ratio */
+    height: 160px;
+    /* padding-top: 8.28%; Height matches width to maintain square aspect ratio */
     border: 1px solid #ddd;
     vertical-align: top;
     text-align: center;
+    padding-top: 80px;
 }
 
 /* Headers - Keep a fixed size */
@@ -277,7 +279,7 @@ h2.month-num {
     justify-content: center;
     /* align-items: center; */
     font-size: 70px;
-    color: #f6f4f2;
+    color: #efebea;
 }
 
 /* Style for event list items */
@@ -349,7 +351,8 @@ h2.month-num {
 
 .event-multiple span:last-child {
     padding-bottom: 10px;
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 
@@ -370,3 +373,5 @@ h2.month-num {
         break-after: page;
     }
 }
+
+

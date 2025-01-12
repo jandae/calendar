@@ -39,6 +39,13 @@
             'event': '#ff9a1e38'
         };
 
+        const eventTypeTextColors = {
+            'birthday': '#357a38',
+            'holiday': '#a84036',
+            'anniversary': '#4b4c5e',
+            'event': '#e65100'
+        };
+
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
@@ -250,6 +257,7 @@
                                 const ageSpan = document.createElement('span');
 
                                 eventDiv.style.backgroundColor = eventTypeColors[event.type] || '#fff';
+                                eventDiv.style.color = eventTypeTextColors[event.type] || 'inherit';
                                 eventDiv.style.marginBottom = '5px'; // Space between events
                                 eventDiv.style.padding = '2px';
                                 eventDiv.style.borderRadius = '4px';
