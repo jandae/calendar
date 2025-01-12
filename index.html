@@ -33,11 +33,10 @@
         const eventLegend = document.getElementById('legend');
 
         const eventTypeColors = {
-            'birthday': '#edffe3',
-            'holiday': '#ffeae7',
-            'anniversary': '#dfe1fa',
-            'working holiday': '#ffe0b2',
-            'event': '#ffcc80'
+            'birthday': '#92ff7738',
+            'holiday': '#ffc2ba57',
+            'anniversary': '#9a9eeb4d',
+            'event': '#ff9a1e38'
         };
 
         function capitalizeFirstLetter(string) {
@@ -80,6 +79,9 @@
                         const [monthB, dayB] = b.split('-').map(num => parseInt(num));
                         return dayA - dayB; // Sort by day
                     });
+                const monthNum = document.createElement('h2');
+                monthNum.classList.add('month-num');
+                monthNum.textContent = monthKey;
 
                 if (monthEvents.length) {
                     const monthDiv = document.createElement('div');
@@ -135,6 +137,7 @@
                     });
 
                     monthDiv.appendChild(ul);
+                    monthDiv.appendChild(monthNum);
                     eventListContainer.appendChild(monthDiv);
                 }
             }
@@ -143,13 +146,12 @@
         }
 
         async function fetchEvents() {
+            // const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSpIW6ptzBpQ6R15IlmK-bVAl4zoZ4Iyg2FOzIpBoDWT2xVNPP2YGfOqp4uAwG5lix2IW02rOJNijDX/pub?output=csv');
             const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTbpjgJ2SDTEcpkLcMbwOwpJJ1fz8Z-gV1_oOaZjHmhKEU8Zr8MKrLjy7RUtyfXj15avQICYv9az7he/pub?output=csv');
             const csvText = await response.text();
 
             const events = {};
             const rows = csvText.split('\n').slice(1);
-
-            console.log("Fetched CSV Data:", csvText);  // Log raw CSV data
 
             rows.forEach(row => {
                 const [timestamp, date, type, description] = row.split(',');
@@ -175,16 +177,12 @@
                 }
             });
 
-            console.log("Parsed Events:", events);  // Log events data after parsing
-
             return events;
         }
 
 
         async function generateCalendar(year) {
             const events = await fetchEvents();
-
-            console.log("Events for Calendar:", events);
 
             for (let month = 0; month < 12; month++) {
                 const firstDay = new Date(year, month, 1).getDay();
@@ -193,9 +191,22 @@
                 const monthDiv = document.createElement('div');
                 monthDiv.classList.add('month');
 
-                const monthTitle = document.createElement('h2');
-                monthTitle.textContent = `${months[month]} ${year}`;
+                const monthTitle = document.createElement('div');
+                monthTitle.classList.add('month-header');
+                const monthName = document.createElement('p');
+                monthName.textContent = `${months[month]} ${year}`;
+                monthTitle.appendChild(monthName);
+
+                const monthNum = document.createElement('p');
+                monthNum.textContent = `${month+1}`;
+                monthTitle.appendChild(monthNum);
+
                 monthDiv.appendChild(monthTitle);
+
+                const monthNumBg = document.createElement('h2');
+                monthNumBg.classList.add('month-num-bg');
+                monthNumBg.textContent = `${month+1}`;
+                monthDiv.appendChild(monthNumBg);
 
                 const table = document.createElement('table');
                 const thead = document.createElement('thead');
@@ -330,11 +341,32 @@
                 monthDiv.appendChild(table);
                 calendarDiv.appendChild(monthDiv);
             }
-            console.log(events)
             displayEventList(events);
         }
 
-        generateCalendar(2025);
+        function equalizeTableHeights() {
+            const tables = document.querySelectorAll('.calendar .month table');
+            let maxHeight = 0;
+
+            // Find the maximum table height
+            tables.forEach(table => {
+                const height = table.offsetHeight;
+                if (height > maxHeight) {
+                    maxHeight = height;
+                }
+            });
+            console.log('hello');
+            console.log(maxHeight);
+
+            // Apply the maximum height to all tables
+            tables.forEach(table => {
+                table.style.height = `${maxHeight}px`;
+            });
+        }
+
+        // Call the function after generating the calendar
+        generateCalendar(2025).then(() => equalizeTableHeights());
+
     </script>
 </body>
 </html>

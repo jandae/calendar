@@ -15,12 +15,33 @@ h1 {
     border-radius: 10px;
     padding: 20px;
     text-align: center;
+    position: relative;
 }
 
-.month h2 {
+.month .month-header {
     margin-bottom: 30px;
     font-size: 30px;
     color: #623f2d;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+}
+
+.month > .month-header p:last-child, .month > .month-header p:first-child {
+    margin: 0;
+}
+
+.month-num-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 30%;
+    font-size: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.07;
 }
 
 table {
@@ -28,19 +49,46 @@ table {
     border-collapse: collapse;
 }
 
-/* Calendar Layout */
+/* Ensure all month tables have the same height */
+.calendar .month {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.calendar .month table {
+    height: 100%;
+    flex-grow: 1;
+}
+
+.calendar .month-header {
+    flex-shrink: 0;
+}
+
+.calendar .month-num-bg {
+    position: absolute;
+    opacity: 0.1;
+    font-size: 30em;
+    text-align: center;
+}
+
+/* Make all tables take the height of the tallest one */
 .calendar {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-/* Table Styling */
 table {
+    table-layout: fixed;
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* Ensures all cells take equal space */
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ccc;
 }
 
 /* Equal-sized square cells */
@@ -72,10 +120,22 @@ td::before {
     left: 15px;
 }
 
-td {
-    font-size: 16px;
-    font-weight: bold;
+td.event-cell {
+    background-color: #f9f9f9;
 }
+
+td.birthday-cell {
+    background-color: rgba(146, 255, 119, 0.4);
+}
+
+td.holiday-cell {
+    background-color: rgba(255, 194, 186, 0.4);
+}
+
+td.anniversary-cell {
+    background-color: rgba(154, 158, 235, 0.3);
+}
+
 
 /* Event display styling */
 .event {
@@ -91,14 +151,16 @@ td {
 
 /* Birthday cells with light green background */
 td.birthday-cell {
-    background-color: #edffe3;
+    /* background-color: #edffe3; */
+    background-color: #92ff7738;
     color: #357a38;
     position: relative;
 }
 
 /* Holiday cells with light red background */
 td.holiday-cell {
-    background-color: #ffeae7;
+    /* background-color: #ffeae7; */
+    background-color: #ffc2ba57;
     color: #a84036;
     position: relative;
     text-align: center;
@@ -107,7 +169,8 @@ td.holiday-cell {
 
 /* Anniversary cells with light purple background */
 td.anniversary-cell {
-    background-color: #dfe1fa;
+    /* background-color: #dfe1fa; */
+    background-color: #9a9eeb4d;
     color: #4b4c5e;
     position: relative;
     text-align: center;
@@ -116,7 +179,8 @@ td.anniversary-cell {
 
 /* Event cells with orange background */
 td.event-cell {
-    background-color: #fbe7c8; /* Light orange background for general events */
+    /* background-color: #fbe7c8; Light orange background for general events */
+    background-color: #ff9a1e38;
     color: #e65100; /* Dark orange color for text */
     position: relative;
     text-align: center;
@@ -135,12 +199,12 @@ td.event-cell {
 }
 
 /* Event text styling */
-.event-birthday, .event-holiday, .event-anniversary {
+.event-birthday, .event-holiday, .event-anniversary, .event {
     position: absolute;
     top: 56%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 16px;
+    font-size: 25px;
     font-weight: bold;
     text-align: center;
     width: 100%;
@@ -149,21 +213,22 @@ td.event-cell {
 
 /* Style for event description span */
 .event-birthday span:first-child, .event-anniversary span:first-child {
-    font-size: 16px;
+    font-size: 25px;
     font-weight: bold;
     display: block;
 }
 
 /* Style for age/years span */
 .event-birthday span:last-child, .event-anniversary span:last-child {
-    font-size: 12px;
+    font-size: 16px;
     /* color: #555; A subtle color for the age text */
     margin-left: 5px; /* Add space between description and age/years */
 }
 
 /* Weekend background */
 .weekend {
-    background-color: #f8f4f3;
+    background-color: #623f2d0d;
+    /* background-color: #f8f4f3; */
 }
 
 /* Event list section - Matching width with calendar */
@@ -192,9 +257,8 @@ td.event-cell {
     flex: 1 0 25%; /* Adjust the width of each month container to be in rows, but still in columns */
     margin-bottom: 20px;
     box-sizing: border-box; /* Ensures padding and margin don't affect width calculation */
+    position: relative;
 }
-
-
 
 .event-month h3 {
     font-size: 1.2em;
@@ -202,9 +266,25 @@ td.event-cell {
     color: #9e7a68;
 }
 
+h2.month-num {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    font-size: 70px;
+    color: #f6f4f2;
+}
+
 /* Style for event list items */
 /* Style for event list items */
 .bullet-list ul {
+    position: relative;
+    z-index: 1
+    ;
     list-style-type: none; /* Remove default list styling */
     padding-left: 0; /* Remove left padding */
 }
@@ -262,11 +342,13 @@ td.event-cell {
 
 .event-multiple span:first-child {
     padding-top: 10px;
+    font-size: 23px;
+    font-weight: bold;
 }
 
 .event-multiple span:last-child {
     padding-bottom: 10px;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 
